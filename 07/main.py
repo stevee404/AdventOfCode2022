@@ -22,7 +22,7 @@ def traverse_dirs(lines: list):
             elif _dir == "/":
                 pwd = ["/"]
             else:
-                pwd.append(_dir)
+                pwd.append(pwd[-1]+_dir)
         
         elif line.startswith("$ ls") or line.startswith("dir"):
             continue
@@ -41,6 +41,16 @@ def filter_dirs(dirs: dict, max_size=100_000):
     return filtered, sum(sizes)
 
 
+def free_disk_space(dirs, total_space=70_000_000, needed_space=30_000_000):
+    used_space = dirs["/"]
+    available_space = total_space - used_space
+    free_up = needed_space - available_space
+    del_candiate = filter(lambda item: item[1] >= free_up, dirs.items())
+    del_candiate = sorted(del_candiate, key=lambda item: item[1])[0]
+    return del_candiate
+
+
+
 if __name__ == "__main__":
     # test 1
     lines = parse_input("test.txt")
@@ -54,5 +64,16 @@ if __name__ == "__main__":
     lines = parse_input()
     dirs = traverse_dirs(lines)
     filtered, sizes = filter_dirs(dirs)
-    print(filtered, sizes)
+    print(sizes)
     
+    # test 2
+    lines = parse_input("test.txt")
+    dirs = traverse_dirs(lines)
+    _dir = free_disk_space(dirs)
+    print(_dir)
+
+    # puzzle 2
+    lines = parse_input()
+    dirs = traverse_dirs(lines)
+    _dir = free_disk_space(dirs)
+    print(_dir)
